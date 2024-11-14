@@ -1,0 +1,65 @@
+<?php
+
+// Arreglo para almacenar las transacciones
+$transacciones = [];
+
+// Función para registrar una nueva transacción
+function registrarTransaccion($id, $descripcion, $monto) {
+    global $transacciones;
+    $transacciones[] = [
+        "id" => $id,
+        "descripcion" => $descripcion,
+        "monto" => $monto
+    ];
+}
+
+// Función para generar el estado de cuenta
+function generarEstadoDeCuenta() {
+    global $transacciones;
+    
+    $montoTotalContado = 0;
+    $estadoCuenta = "Estado de Cuenta\n";
+    $estadoCuenta .= "------------------------\n";
+    $estadoCuenta .= "Transacciones:\n";
+
+    // Recorrer las transacciones para mostrar el detalle y calcular el monto total de contado
+    foreach ($transacciones as $transaccion) {
+        $estadoCuenta .= "ID: " . $transaccion['id'] . "\n";
+        $estadoCuenta .= "Descripción: " . $transaccion['descripcion'] . "\n";
+        $estadoCuenta .= "Monto: $" . number_format($transaccion['monto'], 2) . "\n";
+        $estadoCuenta .= "------------------------\n";
+        $montoTotalContado += $transaccion['monto'];
+    }
+
+    // Calcular el monto con interés del 2.6%
+    $montoConInteres = $montoTotalContado * 1.026;
+
+    // Calcular el cashback del 0.1% del monto de contado
+    $cashback = $montoTotalContado * 0.001;
+
+    // Calcular el monto final a pagar después de aplicar el interés y el cashback
+    $montoFinal = $montoConInteres - $cashback;
+
+    // Agregar los cálculos finales al estado de cuenta
+    $estadoCuenta .= "Monto total de contado: $" . number_format($montoTotalContado, 2) . "\n";
+    $estadoCuenta .= "Monto total con interés (2.6%): $" . number_format($montoConInteres, 2) . "\n";
+    $estadoCuenta .= "Cashback (0.1%): $" . number_format($cashback, 2) . "\n";
+    $estadoCuenta .= "Monto final a pagar: $" . number_format($montoFinal, 2) . "\n";
+
+    // Mostrar el estado de cuenta en pantalla
+    echo nl2br($estadoCuenta);
+
+    // Generar el archivo de texto
+    file_put_contents("estado_cuenta.txt", $estadoCuenta);
+}
+
+// Simulación de transacciones
+registrarTransaccion(1, "Compra en supermercado", 150.00);
+registrarTransaccion(2, "Gasolina", 50.00);
+registrarTransaccion(3, "Compra en línea", 200.00);
+registrarTransaccion(4, "Restaurante", 75.00);
+
+// Generar y mostrar el estado de cuenta
+generarEstadoDeCuenta();
+
+?>
